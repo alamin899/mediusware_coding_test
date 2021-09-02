@@ -8,14 +8,21 @@
 
 
     <div class="card">
-        <form action="" method="get" class="card-header">
+        <form action="{{route('product.index')}}" method="get" class="card-header">
             <div class="form-row justify-content-between">
                 <div class="col-md-2">
-                    <input type="text" name="title" placeholder="Product Title" class="form-control">
+                    <input type="text" name="title" @if(isset($request->title)) value={{$request->title}} @endif placeholder="Product Title" class="form-control">
                 </div>
                 <div class="col-md-2">
                     <select name="variant" id="" class="form-control">
-
+                        <option>Select</option>
+                        @foreach($productVariants as $index => $productVariant)
+                            <optgroup label="{{$index}}">
+                                @foreach($productVariant as $index => $variant)
+                                    <option value="{{$variant->first()->variant->id}}">{{$index}}</option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
                     </select>
                 </div>
 
@@ -24,16 +31,16 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">Price Range</span>
                         </div>
-                        <input type="text" name="price_from" aria-label="First name" placeholder="From"
+                        <input type="number" name="price_from"  @if(isset($request->price_from)) value={{$request->price_from}} @endif aria-label="First name"  placeholder="From"
                                class="form-control">
-                        <input type="text" name="price_to" aria-label="Last name" placeholder="To" class="form-control">
+                        <input type="number" name="price_to" @if(isset($request->price_to)) value={{$request->price_to}} @endif aria-label="Last name" placeholder="To" class="form-control">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <input type="date" name="date" placeholder="Date" class="form-control">
+                    <input type="date" name="date" placeholder="Date"  @if(isset($request->date)) value={{$request->date}} @endif class="form-control">
                 </div>
                 <div class="col-md-1">
-                    <button type="submit" class="btn btn-primary float-right"><i class="fa fa-search"></i></button>
+                    <button type="submit" name="search" value="search" class="btn btn-primary float-right"><i class="fa fa-search"></i></button>
                 </div>
             </div>
         </form>
@@ -111,8 +118,8 @@
                 <div class="col-md-6">
                     <p>Showing {{$products->firstItem()}} to {{$products->lastItem()}} out of {{$products->total()}}</p>
                 </div>
-                <div class="col-md-2">
-                    {{$products->links()}}
+                <div class="col-md-4">
+                    {{$products->appends(request()->except('page'))->links()}}
                 </div>
             </div>
         </div>
