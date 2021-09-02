@@ -24,7 +24,6 @@
                         <h6 class="m-0 font-weight-bold text-primary">Media</h6>
                     </div>
                     <div class="card-body border">
-<!--                        <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-file-added="fileAdded"></vue-dropzone>-->
                         <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-sending="sendingEvent"></vue-dropzone>
                     </div>
                 </div>
@@ -194,7 +193,9 @@ export default {
                 product_variant_prices: this.product_variant_prices
             }
             axios.post('/product', product).then(response => {
-                console.log(response.data);
+                if(response.data =="success"){
+                  window.location='/product'
+                }
             }).catch(error => {
                 console.log(error);
             })

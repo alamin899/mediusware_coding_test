@@ -8,7 +8,7 @@ class ProductVariantRepository
 {
     public function getProductVariantGroupWise()
     {
-        return ProductVariant::with('variant')->get(['id','variant as variant_name','variant_id'])->groupBy(['variant.title','variant_name']);
+        return ProductVariant::with('variant')->get(['id', 'variant as variant_name', 'variant_id'])->groupBy(['variant.title', 'variant_name']);
     }
 
     public function store($request)
@@ -18,12 +18,7 @@ class ProductVariantRepository
         $pvariant->variant_id = $request->variant_id;
         $pvariant->product_id = $request->product_id;
         $pvariant->save();
-        return ['id'=>$pvariant->id] ;
-//        return ProductVariant::create([
-//            'variant' => $request->variant,
-//            'variant_id' => $request->variant_id,
-//            'product_id' => $request->product_id,
-//        ]);
+        return ['id' => $pvariant->id];
     }
 
 }
