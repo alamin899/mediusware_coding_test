@@ -2012,6 +2012,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -2038,7 +2039,7 @@ __webpack_require__.r(__webpack_exports__);
       }],
       product_variant_prices: [],
       dropzoneOptions: {
-        url: 'https://httpbin.org/post',
+        url: 'htpp://127.0.0.1:800/product',
         thumbnailWidth: 150,
         maxFilesize: 0.5,
         headers: {
@@ -2048,6 +2049,12 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    sendingEvent: function sendingEvent(file, xhr, formData) {
+      console.log(formData);
+      this.images.push({
+        file: file
+      });
+    },
     // it will push a new object into product variant
     newVariant: function newVariant() {
       var all_variants = this.variants.map(function (el) {
@@ -50566,7 +50573,8 @@ var render = function() {
             [
               _c("vue-dropzone", {
                 ref: "myVueDropzone",
-                attrs: { id: "dropzone", options: _vm.dropzoneOptions }
+                attrs: { id: "dropzone", options: _vm.dropzoneOptions },
+                on: { "vdropzone-sending": _vm.sendingEvent }
               })
             ],
             1
@@ -50625,9 +50633,9 @@ var render = function() {
                           { domProps: { value: variant.id } },
                           [
                             _vm._v(
-                              "\n                                        " +
+                              "\n                                            " +
                                 _vm._s(variant.title) +
-                                "\n                                    "
+                                "\n                                        "
                             )
                           ]
                         )

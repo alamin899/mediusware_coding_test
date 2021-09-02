@@ -24,7 +24,8 @@
                         <h6 class="m-0 font-weight-bold text-primary">Media</h6>
                     </div>
                     <div class="card-body border">
-                        <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
+<!--                        <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-file-added="fileAdded"></vue-dropzone>-->
+                        <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-sending="sendingEvent"></vue-dropzone>
                     </div>
                 </div>
             </div>
@@ -126,7 +127,7 @@ export default {
             ],
             product_variant_prices: [],
             dropzoneOptions: {
-                url: 'https://httpbin.org/post',
+                url: 'htpp://127.0.0.1:800/product',
                 thumbnailWidth: 150,
                 maxFilesize: 0.5,
                 headers: {"My-Awesome-Header": "header value"}
@@ -134,6 +135,10 @@ export default {
         }
     },
     methods: {
+      sendingEvent (file, xhr, formData) {
+        console.log(formData)
+        this.images.push({file})
+      },
         // it will push a new object into product variant
         newVariant() {
             let all_variants = this.variants.map(el => el.id)

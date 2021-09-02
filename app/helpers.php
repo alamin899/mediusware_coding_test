@@ -19,3 +19,21 @@ function combination($arrays)
     }
     return $result;
 }
+
+function customFileUpload($imagBase64)
+{
+    $exploded = explode(',', $imagBase64);
+    $decodedValue = base64_decode($exploded[1]);
+    $strpos = strpos($imagBase64, ';');
+    $sub = substr($imagBase64, 0, $strpos);
+    $extention = explode('/', $sub)[1];
+    $fileName = date('YmdHis') . '.' . $extention;
+    $path = public_path() . '/images/' . $fileName;
+    $uploaded = file_put_contents($path, $decodedValue);
+    if ($uploaded) {
+        return [
+            'file_name' => $fileName,
+            'full_path' => $path
+        ];
+    } else return '';
+}

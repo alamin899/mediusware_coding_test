@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\ProductVariant;
-use App\Models\ProductVariantPrice;
 use App\Models\Variant;
+use App\Repositories\ProductImageRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductVariantPriceRepository;
 use App\Repositories\ProductVariantRepository;
-use http\Env\Response;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -18,10 +16,15 @@ class ProductController extends Controller
      * @var ProductRepository
      */
     private $productRepository;
+    /**
+     * @var ProductImageRepository
+     */
+    private $productImageRepository;
 
-    public function __construct(ProductRepository $productRepository)
+    public function __construct(ProductRepository $productRepository, ProductImageRepository $productImageRepository)
     {
         $this->productRepository = $productRepository;
+        $this->productImageRepository = $productImageRepository;
     }
 
     /**
@@ -62,22 +65,22 @@ class ProductController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, ProductVariantRepository $productVariantRepository,ProductVariantPriceRepository $productVariantPriceRepository)
+    public function store(Request $request, ProductVariantRepository $productVariantRepository, ProductVariantPriceRepository $productVariantPriceRepository)
     {
-        $storeProductVariantData = [];
         $productStore = $this->productRepository->store($this->customProductRequest($request));
+        $productImageUpload = $this->productImageUpload($request['product_image'], $productStore->id);
         foreach ($request->product_variant as $p_variant) {
-            foreach ($p_variant['tags'] as  $tag) {
+            foreach ($p_variant['tags'] as $tag) {
                 $storeProductVariant = $productVariantRepository->store($this->customProductVariantRequest($tag, $p_variant['option'], $productStore->id));
                 $storeProductVariantData[$p_variant['option']][] = $storeProductVariant['id'];
             }
         }
         $totalCombination = combination($storeProductVariantData);
-        foreach ($request->product_variant_prices as $pvpIndex => $product_variant_price){
-        $requestData  = $this->customProductVariantPriceRequest($totalCombination[$pvpIndex],$product_variant_price,$productStore->id);
-        $store = $productVariantPriceRepository->store($requestData);
+        foreach ($request->product_variant_prices as $pvpIndex => $product_variant_price) {
+            $requestData = $this->customProductVariantPriceRequest($totalCombination[$pvpIndex], $product_variant_price, $productStore->id);
+            $store = $productVariantPriceRepository->store($requestData);
         }
-        return ($store)?"success" : "failed";
+        return ($store) ? "success" : "failed";
     }
 
     private function customProductRequest($request)
@@ -98,14 +101,34 @@ class ProductController extends Controller
         ]);
     }
 
-    private function customProductVariantPriceRequest($productVariants,$product_variant_price,$product_id)
+    private function customProductVariantPriceRequest($productVariants, $product_variant_price, $product_id)
     {
         return new Request([
-            'product_variant_one' => (isset($productVariants[0]))?$productVariants[0]:null,
-            'product_variant_two' => (isset($productVariants[1]))?$productVariants[1]:null,
-            'product_variant_three' => (isset($productVariants[2]))?$productVariants[2]:null,
+            'product_variant_one' => (isset($productVariants[0])) ? $productVariants[0] : null,
+            'product_variant_two' => (isset($productVariants[1])) ? $productVariants[1] : null,
+            'product_variant_three' => (isset($productVariants[2])) ? $productVariants[2] : null,
             'price' => $product_variant_price['price'],
             'stock' => $product_variant_price['stock'],
+            'product_id' => $product_id,
+        ]);
+    }
+
+    private function productImageUpload($imageData, $product_id)
+    {
+        if (sizeof($imageData) > 0 && !empty($product_id)) {
+            foreach ($imageData as $image) {
+                $upload = customFileUpload($image['file']['dataURL']);
+                $store = $this->productImageRepository->store($this->customImageRequest($upload, $product_id));
+            }
+            return $store;
+        }
+    }
+
+    private function customImageRequest($imageInfo, $product_id)
+    {
+        return new Request([
+            'file_path' => $imageInfo['full_path'],
+            'thumbnail' => null,
             'product_id' => $product_id,
         ]);
     }
