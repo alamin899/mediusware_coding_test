@@ -175,6 +175,7 @@ export default {
                 return ans.concat(self.getCombn(arr.slice(1), pre + value + '/'));
             }, []);
             return ans;
+
         },
 
         // store product into database
@@ -187,8 +188,6 @@ export default {
                 product_variant: this.product_variant,
                 product_variant_prices: this.product_variant_prices
             }
-
-
             axios.post('/product', product).then(response => {
                 console.log(response.data);
             }).catch(error => {

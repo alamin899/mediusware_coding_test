@@ -69,4 +69,13 @@ class ProductRepository
             return $productVariantPrices->where('price', '<=', $price_to);
         });
     }
+
+    public function store($request)
+    {
+        return Product::create([
+            'title' => $request->title,
+            'sku' => $request->sku,
+            'description' => $request->description,
+        ]);
+    }
 }
