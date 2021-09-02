@@ -152,8 +152,16 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
+
+        $product = $product->load($this->reletionShip());
         $variants = Variant::all();
-        return view('products.edit', compact('variants'));
+        return view('products.edit', compact('variants','product'));
+    }
+    private function reletionShip()
+    {
+        return ['productVariantPrices', 'productVariantPrices.productVariantOne:id,variant as variant_name,variant_id',
+            'productVariantPrices.productVariantOne.variant', 'productVariantPrices.productVariantTwo:id,variant as variant_name,variant_id', 'productVariantPrices.productVariantTwo.variant',
+            'productVariantPrices.productVariantThree:id,variant as variant_name,variant_id', 'productVariantPrices.productVariantThree.variant'];
     }
 
     /**
