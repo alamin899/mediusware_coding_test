@@ -6,10 +6,21 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
 use App\Models\Variant;
+use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    /**
+     * @var ProductRepository
+     */
+    private $productRepository;
+
+    public function __construct(ProductRepository $productRepository)
+    {
+        $this->productRepository = $productRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +28,12 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return view('products.index');
+         $products = $this->productRepository->getProductByRequest()
+            ->with('productVariantPrices', 'productVariantPrices.productVariantOne:id,variant as variant_name,variant_id',
+                'productVariantPrices.productVariantOne.variant:id,title', 'productVariantPrices.productVariantTwo:id,variant as variant_name,variant_id', 'productVariantPrices.productVariantTwo.variant:id,title',
+                'productVariantPrices.productVariantThree:id,variant as variant_name,variant_id', 'productVariantPrices.productVariantThree.variant:id,title')
+            ->paginate(getPagination());
+        return view('products.index',compact('products'));
     }
 
     /**
